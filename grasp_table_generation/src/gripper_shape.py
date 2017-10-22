@@ -9,7 +9,7 @@ class gripper_shape():
         self.initGripperLengthMove()
 
     def initGripperLengthFest(self):
-        gripperLengthFest1 = "~gripperLength1"
+        gripperLengthFest1 = "~gripperLength1" #rospy.get_parram()
         gripperLengthFest2 = "~gripperLength2"
         gripperLengthFest3 = "~gripperLength3"
         self.gripperLengthFest = {'start': gripperLengthFest1, 'between': gripperLengthFest2, 'end': gripperLengthFest3}
@@ -26,5 +26,5 @@ class gripper_shape():
         self.gripperLengthMove = {'start': gripperLengthMove1, 'between': gripperLengthMove2, 'end': gripperLengthMove3}
 
     def initGripperWithMove(self):
-        self.gripperWidthMove = 1.5
+        self.gripperWidthMove = 15 #mm
     
