@@ -148,23 +148,35 @@ class grasp_2D_parameters(gripper_shape):
         stepAE = 0.5*self.gripperOriginalPointOrientationAccuracy
         point = None
         angle = None
-        for self.gripperOriginalPoint['position'][0] in numpy.arange(startX, endX, stepX):
-            for self.gripperOriginalPoint['position'][1] in numpy.arange(startY, endY, stepY):
-                for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, endR, stepR):
-                    for self.gripperAngleMove['start'] in numpy.arange(startAS, endAS, stepAS):
-                        for self.gripperAngleMove['end'] in numpy.arange(startAE, endAE, stepAE):
-                            self.createGripperPointsPosition()
-                            if not self.conformToRestriction(graspType):
-                                continue
-                            evalValue = self.calculateCriteria(graspType)
-                            if evalValue > self.evaluationValue:
-                                continue
-                            point = self.gripperOriginalPoint
-                            angle = self.gripperAngleMove
+        if self.confirmToObjectShapeRestricrion(graspType):
+            for self.gripperOriginalPoint['position'][0] in numpy.arange(startX, endX, stepX):
+                for self.gripperOriginalPoint['position'][1] in numpy.arange(startY, endY, stepY):
+                    for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, endR, stepR):
+                        for self.gripperAngleMove['start'] in numpy.arange(startAS, endAS, stepAS):
+                            for self.gripperAngleMove['end'] in numpy.arange(startAE, endAE, stepAE):
+                                self.createGripperPointsPosition()
+                                if not self.conformToRestriction(graspType):
+                                    continue
+                                evalValue = self.calculateCriteria(graspType)
+                                if evalValue > self.evaluationValue:
+                                    continue
+                                point = self.gripperOriginalPoint
+                                angle = self.gripperAngleMove
         if point is not None:
             self.existence = True
             self.gripperOriginalPoint = point
             self.gripperAngleMove = angle
+
+    def confirmToObjectShapeRestricrion(self, graspType):
+        if graspType is '1':
+            return self.confirmToObjectShapeRestricrionFromParallelGrasp()
+        if graspType is '2':
+            return self.confirmToObjectShapeRestricrionFromPlanarPointContact()
+        if graspType is '3':
+            return self.confirmToObjectShapeRestricrionFromPointContacts()
+        else:
+            print "there is no such grasping type!"
+            exit()
 
     def conformToRestriction(self, graspType):
         if graspType is '1':
@@ -188,6 +200,17 @@ class grasp_2D_parameters(gripper_shape):
             print "there is no such grasping type!"
             exit()
 
+
+    def confirmToObjectShapeRestricrionFromParallelGrasp(self):
+        lengthDifference = self.gripperValidLengthFest['between'] - self.gripperValidLengthMove['between']
+        angle = self.gripperAngleFest['start'] 
+        ObjectLengthXMin = lengthDifference*math.sin(angle)
+        objectLengthXMax = self.gripperValidLengthFest['between']*math.sin(angle) - self.gripperValidLengthMove['between']
+        if self.objectShape['x'] < ObjectLengthXMin:
+            return False
+        if self.objectShape['x'] > ObjectLengthXMax:
+            return False
+        return True
 
 
     # restriction of obect shape have not been considered yet.
@@ -281,6 +304,13 @@ class grasp_2D_parameters(gripper_shape):
         self.gripperAngleMoveRoom['end'][0] = math.pi/2
         self.gripperAngleMoveRoom['end'][1] = math.pi
 
+    def confirmToObjectShapeRestricrionFromPlanarPointContact(self):
+        if self.objectShape['x'] < self.getGripperTotalFestLengthX():
+            return False
+        if self.objectShape['x'] < (self.getGripperTotalFestLengthX()+self.gripperLengthMove['between']):
+            return False
+        return True
+
     # restriction of obect shape have not been considered yet.
     def conformToRestrictionFromPlanarPointContact(self):
         lineGripperFest = [self.gripperPointsPositionFest['between'], self.gripperPointsPositionFest['end']]
@@ -357,7 +387,14 @@ class grasp_2D_parameters(gripper_shape):
         self.gripperAngleMoveRoom['start'][1] = math.pi/2
         self.gripperAngleMoveRoom['end'][0] = math.pi/2
         self.gripperAngleMoveRoom['end'][1] = math.pi
-    
+
+    def confirmToObjectShapeRestricrionFromPointContacts(self):
+        if self.objectShape['x'] < self.getGripperTotalFestLengthX():
+            return False
+        if self.objectShape['x'] < (self.getGripperTotalFestLengthX()+self.gripperLengthMove['between']):
+            return False
+        return True
+
     def conformToRestrictionFromPointContacts(self):
         lineGripperFest = [self.gripperPointsPositionFest['between'], self.gripperPointsPositionFest['end']]
         lineGripperMoveStart = [self.gripperPointsPositionMove['start'], self.gripperPointsPositionMove['between']]

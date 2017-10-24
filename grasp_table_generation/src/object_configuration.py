@@ -8,13 +8,11 @@ class ObjectConfiguration():
     def __init__(self):
         self.initPublisher()
         self.initParameter()
-        self.initBaseFrame()
         self.initObjectDescription3D()
         self.initObjectDescription2D()
 
     def initPublisher(self):
         self.brObjectFrame = tf.TransformBroadcaster()
-        rate = rospy.Rate(10.0)
 
     def initParameter(self):
         self.object2DFrameName = {}
@@ -70,6 +68,7 @@ class ObjectConfiguration():
         self.objectShape2D.update({projectedPlane: [objectShape2DX, objectShape2DY]})
 
     def broadcastObject2DFrames(self):
+        self.initBaseFrame()
         objectProjectedPlanes = ['xy', 'xz', 'yx', 'yz', 'zx', 'zy']
         for i, objectProjectedPlane in enumerate(objectProjectedPlanes):
             self.broadcastObject2DFrame(objectProjectedPlane)
@@ -91,9 +90,11 @@ class ObjectConfiguration():
 
 if __name__ is '__main__':
     rospy.init_node('ObjectConfiguration')
+    objectConfig = ObjectConfiguration()
     try:
-        objectConfig = ObjectConfiguration()
-        objectConfig.broadcastObject2DFrames()
-        rospy.spin()
+        rate = rospy.Rate(10.0)
+        while not rospy.is_shutdown():
+            objectConfig.broadcastObject2DFrames()
+            rate.sleep()
     except:
         exit()
