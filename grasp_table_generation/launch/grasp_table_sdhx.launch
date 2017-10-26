@@ -1,17 +1,8 @@
 <launch>
 
-  <node name="grasp_table_generation_sdhx" pkg="grasp_table_generation" type="grasp_table_generation_sdhx.py">
-    <param name="gripperLength1" value= />
-    <param name="gripperLength2" value= />
-    <param name="gripperLength3" value= />
-    <param name="gripperFingerLength1" value= />
-    <param name="gripperFingerLength2" value= />
-    <param name="gripperAngleL12" value= />
-    <param name="gripperAngleL23" value= />
-    <param name="objectLength" value=50 />
-    <param name="objectWidth" value=40 />
-    <param name="objectHeight" value=70 />
-    <param name="coordinationPosition" value="mittel" />
-  </node>
+  <rosparam command="load" ns="grasp_table_generation" file="$(find grasp_table_generation)/launch/grasp_table_sdhx.yaml"/>
+
+  <node name="object_configutarion" ns="grasp_table_generation" pkg="grasp_table_generation" type="ObjectConfiguration.py" output="screen"/>
+
 
 </launch>

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 #import rospy
 import math
@@ -16,7 +16,7 @@ class grasp_2D_parameters(gripper_shape):
 
     def initGrasp2DParameters(self):
         self.gripperAngleMove = {'start': 0, 'end': 0}
-        self.gripperOriginalPoint = {'position': [0, 0], 'orientation': math.pi/2} 
+        self.gripperOriginalPoint = {'position': [0, 0], 'orientation': math.pi/2}
         self.gripperSlopeAngle = 0
         self.evaluationValue = 100000
         self.existence = False
@@ -53,7 +53,7 @@ class grasp_2D_parameters(gripper_shape):
         for part, length in self.gripperLengthMove:
             self.gripperValidLengthMove.update({part: length*math.cos(self.gripperSlopeAngle)})
 
-    ##### finished transfer to loop, the thickness of the moving finger have not been considered yet
+
     def createGripperPointsPosition(self):
         self.createGripperPointsPositionFest()
         self.createGripperPointsPositionMove()
@@ -126,11 +126,12 @@ class grasp_2D_parameters(gripper_shape):
         self.gripperAngleMoveRoom['end'][1] = math.pi/2 + 2*self.gripperOriginalPointOrientationAccuracy
 
 
-    # this function is only for the parallel grasp because of the evaluation function.
+
     def findParametersWithExhaustiveSearch(self, graspType):
         """graspType = '1': parallel grasp"""
         """graspType = '2': grasp with planar and point contacts"""
         """graspType = '3': grasp with point contacts"""
+        self.initGrasp2DParameters()
         startX = self.gripperOriginalPointPoseRoom['x'][0]
         endX = self.gripperOriginalPointPoseRoom['x'][1]
         stepX = 0.5*self.gripperOriginalPointPositionAccuracy
@@ -213,7 +214,7 @@ class grasp_2D_parameters(gripper_shape):
         return True
 
 
-    # restriction of obect shape have not been considered yet.
+
     def conformToRestrictionFromParallelGrasp(self):
         lineGripperFest = [self.gripperPointsPositionFest['between'], self.gripperPointsPositionFest['end']]
         lineGripperMove = [self.gripperPointsPositionMove['between'], self.gripperPointsPositionMove['end']]
@@ -307,11 +308,15 @@ class grasp_2D_parameters(gripper_shape):
     def confirmToObjectShapeRestricrionFromPlanarPointContact(self):
         if self.objectShape['x'] < self.getGripperTotalFestLengthX():
             return False
-        if self.objectShape['x'] < (self.getGripperTotalFestLengthX()+self.gripperLengthMove['between']):
+        if self.objectShape['x'] > (self.getGripperTotalFestLengthX()+self.gripperLengthMove['between']):
+            return False
+        if self.objectShape['y'] < (self.gripperLengthMove['between']-self.gripperLengthMove['end']):
+            return False
+        if self.objectShape['y'] > self.gripperLengthMove['between']:
             return False
         return True
 
-    # restriction of obect shape have not been considered yet.
+
     def conformToRestrictionFromPlanarPointContact(self):
         lineGripperFest = [self.gripperPointsPositionFest['between'], self.gripperPointsPositionFest['end']]
         lineGripperMoveEnd = [self.gripperPointsPositionMove['between'], self.gripperPointsPositionMove['end']]
@@ -391,7 +396,11 @@ class grasp_2D_parameters(gripper_shape):
     def confirmToObjectShapeRestricrionFromPointContacts(self):
         if self.objectShape['x'] < self.getGripperTotalFestLengthX():
             return False
-        if self.objectShape['x'] < (self.getGripperTotalFestLengthX()+self.gripperLengthMove['between']):
+        if self.objectShape['x'] > (self.getGripperTotalFestLengthX()+self.gripperLengthMove['between']):
+            return False
+        if self.objectShape['y'] < (self.gripperLengthMove['between']-self.gripperLengthMove['end']):
+            return False
+        if self.objectShape['y'] > self.gripperLengthMove['between']:
             return False
         return True
 

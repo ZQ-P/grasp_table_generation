@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import math
 import rospy
@@ -7,11 +7,12 @@ import tf
 class ObjectConfiguration():
     def __init__(self):
         self.initPublisher()
-        self.initParameter()
         self.initObjectDescription3D()
+        self.initParameter()
         self.initObjectDescription2D()
 
     def initPublisher(self):
+        print '1'
         self.brObjectFrame = tf.TransformBroadcaster()
 
     def initParameter(self):
@@ -43,13 +44,14 @@ class ObjectConfiguration():
         self.brObjectFrame.sendTransform(translation, quaternion, rospy.Time.now(), self.objectOriginalCoordnationFrameName, self.objectCenterFrameName)
 
     def initObjectDescription3D(self):
-        objectLength = '~objectLength'
-        objectWidth = '~objectWidth'
-        objectHeight = '~objectHeight'
+        objectLength = rospy.get_param('/grasp_table_generation/objectLength')
+        objectWidth = rospy.get_param('/grasp_table_generation/objectWidth')
+        objectHeight = rospy.get_param('/grasp_table_generation/objectHeight')
         self.objectShape3D = {'x': objectLength, 'y': objectWidth, 'z': objectHeight}
-        self.objectCoordnationPose3D = '~coordinationPosition'
-        self.objectWeightLevel = ''
-        self.objectHardnessLevel = ''
+        self.objectCoordnationPose3D = rospy.get_param('/grasp_table_generation/objectCoordnationPose3D')
+        self.objectWeightLevel = rospy.get_param('/grasp_table_generation/objectWeightLevel')
+        self.objectHardnessLevel = rospy.get_param('/grasp_table_generation/objectHardnessLevel')
+
 
     def initObjectDescription2D(self):
         self.objectShape2D = {}
@@ -72,7 +74,7 @@ class ObjectConfiguration():
         objectProjectedPlanes = ['xy', 'xz', 'yx', 'yz', 'zx', 'zy']
         for i, objectProjectedPlane in enumerate(objectProjectedPlanes):
             self.broadcastObject2DFrame(objectProjectedPlane)
-            print 'the projected plane of object (frame): ', objectProjectedPlane
+            #print 'the projected plane of object (frame): ', objectProjectedPlane
 
     def broadcastObject2DFrame(self, projectedPlane):
         object2DFrameTranslation = self.object2DFrameTransformFrom3D[projectedPlane][0]
@@ -88,8 +90,8 @@ class ObjectConfiguration():
     def getObjectshape2D(self):
         return self.objectShape2D
 
-if __name__ is '__main__':
-    rospy.init_node('ObjectConfiguration')
+if __name__ == "__main__":
+    rospy.init_node('object_configuration')
     objectConfig = ObjectConfiguration()
     try:
         rate = rospy.Rate(10.0)
