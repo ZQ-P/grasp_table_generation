@@ -17,10 +17,14 @@ import rospy
 class TestObjectConfiguration(unittest.TestCase):
     def setUp(self):
         rospy.init_node('test_object_configuration')
-        with threading.Lock():
-            self.listener=tf.TransformListener(True, rospy.Duration(40.0))
+        self.initTFListener()
         self.initTestPoint()
     
+    def initTFListener(self):
+        with threading.Lock():
+            self.listener=tf.TransformListener(True, rospy.Duration(40.0))
+
+
     def initTestPoint(self):
         self.testPoint = PoseStamped()
         self.testPoint.header.frame_id = "object3DCenter"
@@ -36,7 +40,7 @@ class TestObjectConfiguration(unittest.TestCase):
         
 
     def test_TransformationXY(self):
-        self.listener.waitForTransform()
+        self.listener.waitForTransform
         pass
 
     def test_TransformationXZ(self):
