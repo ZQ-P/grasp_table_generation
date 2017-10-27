@@ -12,7 +12,6 @@ class ObjectConfiguration():
         self.initObjectDescription2D()
 
     def initPublisher(self):
-        print '1'
         self.brObjectFrame = tf.TransformBroadcaster()
 
     def initParameter(self):
