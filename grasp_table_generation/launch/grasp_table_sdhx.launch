@@ -4,6 +4,6 @@
 
   <node name="object_configutarion" ns="grasp_table_generation" pkg="grasp_table_generation" type="ObjectConfiguration.py" output="screen"/>
 
-  <test test-name="test_object_configuration" pkg="grasp_table_generation" type="TestObjectConfiguration"/>
+  <test test-name="ObjectConfiguration" pkg="grasp_table_generation" type="TestObjectConfiguration.py"/>
 
 </launch>

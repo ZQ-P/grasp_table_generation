@@ -4,3 +4,13 @@ objectHeight: 6
 objectCoordnationPose3D: 'mittel'
 objectWeightLevel: 'mittel'
 objectHardnessLevel: 'mittel'
+
+gripperLengthFest1: 63.464
+gripperLengthFest2: 62.390
+gripperLengthFest3: 77.050
+gripperAngleFestL12: 0
+gripperAngleFeatL23: 0
+gripperLengthMove1: 46
+gripperLengthMove2: 50
+gripperLengthMove3: 70
+gripperWidthMove: 15
