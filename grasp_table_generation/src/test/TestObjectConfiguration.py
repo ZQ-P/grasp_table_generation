@@ -13,7 +13,6 @@ from geometry_msgs.msg import PoseStamped, TransformStamped
 import rospy
 
 
-#calculating errors have not been considered.
 class TestObjectConfiguration(unittest.TestCase):
     def setUp(self):
         self.initTFListener()
@@ -41,43 +40,49 @@ class TestObjectConfiguration(unittest.TestCase):
     def test_TransformationXY(self):
         self.listener.waitForTransform('/object2Dxy', "/object3DCenter", rospy.Time(0), rospy.Duration(10))
         pointXY = self.listener.transformPose('/object2Dxy', self.testPoint)
-        pointTrans = [pointXY.pose.position.x, pointXY.pose.position.y, pointXY.pose.position.z]
-        pointRot = [pointXY.pose.orientation.w, pointXY.pose.orientation.x, pointXY.pose.orientation.y, pointXY.pose.orientation.z]
+        trans = [pointXY.pose.position.x, pointXY.pose.position.y, pointXY.pose.position.z]
+        #rot = [pointXY.pose.orientation.w, pointXY.pose.orientation.x, pointXY.pose.orientation.y, pointXY.pose.orientation.z]
+        pointTrans = [round(trans[i], 2) for i in range(0, len(trans))]
         self.assertEqual(pointTrans, [1, 3, 1])
 
     def test_TransformationXZ(self):
         self.listener.waitForTransform('/object2Dxz', "/object3DCenter", rospy.Time(0), rospy.Duration(10))
         pointXZ = self.listener.transformPose('/object2Dxz', self.testPoint)
-        pointTrans = [pointXZ.pose.position.x, pointXZ.pose.position.y, pointXZ.pose.position.z]
-        pointRot = [pointXZ.pose.orientation.w, pointXZ.pose.orientation.x, pointXZ.pose.orientation.y, pointXZ.pose.orientation.z]
+        trans = [pointXZ.pose.position.x, pointXZ.pose.position.y, pointXZ.pose.position.z]
+        #rot = [pointXZ.pose.orientation.w, pointXZ.pose.orientation.x, pointXZ.pose.orientation.y, pointXZ.pose.orientation.z]
+        pointTrans = [round(trans[i], 2) for i in range(0, len(trans))]
         self.assertEqual(pointTrans, [1, 4, -1])
 
     def test_TransformationYX(self):
         self.listener.waitForTransform('/object2Dyx', "/object3DCenter", rospy.Time(0), rospy.Duration(10))
         pointYX = self.listener.transformPose('/object2Dyx', self.testPoint)
-        pointTrans = [pointYX.pose.position.x, pointYX.pose.position.y, pointYX.pose.position.z]
-        pointRot = [pointYX.pose.orientation.w, pointYX.pose.orientation.x, pointYX.pose.orientation.y, pointYX.pose.orientation.z]
+        trans = [pointYX.pose.position.x, pointYX.pose.position.y, pointYX.pose.position.z]
+        #rot = [pointYX.pose.orientation.w, pointYX.pose.orientation.x, pointYX.pose.orientation.y, pointYX.pose.orientation.z]
+        pointTrans = [round(trans[i], 2) for i in range(0, len(trans))]
         self.assertEqual(pointTrans, [1, 2, -1])
 
     def test_TransformationYZ(self):
         self.listener.waitForTransform('/object2Dyz', "/object3DCenter", rospy.Time(0), rospy.Duration(10))
         pointYZ = self.listener.transformPose('/object2Dyz', self.testPoint)
-        pointTrans = [pointYZ.pose.position.x, pointYZ.pose.position.y, pointYZ.pose.position.z]
-        pointRot = [pointYZ.pose.orientation.w, pointYZ.pose.orientation.x, pointYZ.pose.orientation.y, pointYZ.pose.orientation.z]
+        trans = [pointYZ.pose.position.x, pointYZ.pose.position.y, pointYZ.pose.position.z]
+        #rot = [pointYZ.pose.orientation.w, pointYZ.pose.orientation.x, pointYZ.pose.orientation.y, pointYZ.pose.orientation.z]
+        pointTrans = [round(trans[i], 2) for i in range(0, len(trans))]
         self.assertEqual(pointTrans, [1, 4, 1])
 
     def test_TransformationZX(self):
         self.listener.waitForTransform('/object2Dzx', "/object3DCenter", rospy.Time(0), rospy.Duration(10))
         pointZX = self.listener.transformPose('/object2Dzx', self.testPoint)
-        pointTrans = [pointZX.pose.position.x, pointZX.pose.position.y, pointZX.pose.position.z]
-        pointRot = [pointZX.pose.orientation.w, pointZX.pose.orientation.x, pointZX.pose.orientation.y, pointZX.pose.orientation.z]
+        trans = [pointZX.pose.position.x, pointZX.pose.position.y, pointZX.pose.position.z]
+        #rot = [pointZX.pose.orientation.w, pointZX.pose.orientation.x, pointZX.pose.orientation.y, pointZX.pose.orientation.z]
+        pointTrans = [round(trans[i], 2) for i in range(0, len(trans))]
         self.assertEqual(pointTrans, [1, 2, 1])
 
     def test_TransformationZY(self):
         self.listener.waitForTransform('/object2Dzy', "/object3DCenter", rospy.Time(0), rospy.Duration(10))
         pointZY = self.listener.transformPose('/object2Dzy', self.testPoint)
-        pointTrans = [pointZY.pose.position.x, pointZY.pose.position.y, pointZY.pose.position.z]
-        pointRot = [pointZY.pose.orientation.w, pointZY.pose.orientation.x, pointZY.pose.orientation.y, pointZY.pose.orientation.z]
+        trans = [pointZY.pose.position.x, pointZY.pose.position.y, pointZY.pose.position.z]
+        #rot = [pointZY.pose.orientation.w, pointZY.pose.orientation.x, pointZY.pose.orientation.y, pointZY.pose.orientation.z]
+        pointTrans = [round(trans[i], 2) for i in range(0, len(trans))]
         self.assertEqual(pointTrans, [1, 3, -1])
 
 

@@ -2,8 +2,12 @@
 
   <rosparam command="load" ns="grasp_table_generation" file="$(find grasp_table_generation)/launch/grasp_table_sdhx.yaml"/>
 
-  <node name="object_configutarion" ns="grasp_table_generation" pkg="grasp_table_generation" type="ObjectConfiguration.py" output="screen"/>
+  <!--node name="object_configutarion" ns="grasp_table_generation" pkg="grasp_table_generation" type="ObjectConfiguration.py" output="screen"/-->
 
-  <test test-name="ObjectConfiguration" pkg="grasp_table_generation" type="TestObjectConfiguration.py"/>
+  <!--test test-name="ObjectConfiguration" pkg="grasp_table_generation" type="TestObjectConfiguration.py"/-->
+
+  <!--node name="grasp_2D_parameters" ns="grasp_table_generation" pkg="grasp_table_generation" type="grasp_2D_parameters.py" output="screen"/-->
+
+  <test test-name="Grasp2DParameters" pkg="grasp_table_generation" type="TestGrasp2DParameters.py"/>
 
 </launch>

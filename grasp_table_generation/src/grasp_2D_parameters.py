@@ -1,31 +1,33 @@
 #!/usr/bin/env python
 
-#import rospy
+import rospy
 import math
 import numpy
+import scipy
 from gripper_shape import gripper_shape
-from object_configuration import ObjectConfiguration
+from ObjectConfiguration import ObjectConfiguration
 
 class grasp_2D_parameters(gripper_shape):
-    def __init__(self):
+    def __init__(self, objectX, objectY):
+        gripper_shape.__init__(self)
         self.initGrasp2DParameters()
         self.initGrasp2DTolerances()
         self.initGrasp2DVariables()
-        self.initObject2D()
+        self.initObject2D(objectX, objectY)
 
 
     def initGrasp2DParameters(self):
         self.gripperAngleMove = {'start': 0, 'end': 0}
         self.gripperOriginalPoint = {'position': [0, 0], 'orientation': math.pi/2}
         self.gripperSlopeAngle = 0
-        self.evaluationValue = 100000
+        self.evaluationValue = 1000000
         self.existence = False
 
     def initGrasp2DTolerances(self):
         self.lengthLineConformMin = 1
         self.distanceObectGripperMin = 0.8
         #self.distanceLineConformMax = 0.2
-        self.distancePointOnLineMax = 0.2
+        self.distancePointOnLineMax = 1
         self.gripperOriginalPointPositionAccuracy = 1
         self.gripperOriginalPointOrientationAccuracy = 0.01
         self.gripperAngleMoveAccuracy = 0.01
@@ -41,16 +43,17 @@ class grasp_2D_parameters(gripper_shape):
         #self.gripperOriginalPointOrientationRoom = [0, 0]
         self.gripperSlopeAngleRoom = [0, 0]
 
-    #ObjectConfiguration hier stellen oder von andere class
-    def initObject2D(self):
-        objectConfig = ObjectConfiguration()
-        self.objectShapes2D = objectConfig.getObjectshape2D()
-        self.objectShape = {'x': 0, 'y': 0}
+    def initObject2D(self, objectX, objectY):
+        self.objectShape = {'x': objectX, 'y': objectY}
+        self.objectShapePoints.update({'leftUp': [-0.5*self.objectShape['x'], self.objectShape['y']]})
+        self.objectShapePoints.update({'leftDown': [-0.5*self.objectShape['x'], 0]})
+        self.objectShapePoints.update({'rightUp': [0.5*self.objectShape['x'], self.objectShape['y']]})
+        self.objectShapePoints.update({'rightDown': [0.5*self.objectShape['x'], 0]})
 
     def initGripperEffectiveLength(self):
-        for part, length in self.gripperLengthFest:
+        for part, length in self.gripperLengthFest.items():
             self.gripperValidLengthFest.update({part: length*math.cos(self.gripperSlopeAngle)})
-        for part, length in self.gripperLengthMove:
+        for part, length in self.gripperLengthMove.items():
             self.gripperValidLengthMove.update({part: length*math.cos(self.gripperSlopeAngle)})
 
 
@@ -92,19 +95,8 @@ class grasp_2D_parameters(gripper_shape):
         endPointPosition = self.getPointWithLineSegment(startPointPosition, segmentLength, startPointOrientation)
         self.gripperPointsPositionMove.update({'end': endPointPosition})
 
-    #the function needs to change, receive the self.obectShape from the outside
-    def getParametersFromDifferentPose(self):
-        for plane, objectLengthWidth in self.objectShapes2D.items():
-            self.objectShape['x'] = objectLengthWidth[0]
-            self.objectShape['y'] = objectLengthWidth[1]
-            self.objectShapePoints.update({'leftUp': [-0.5*self.objectShape['x'], self.objectShape['y']]})
-            self.objectShapePoints.update({'leftDown': [-0.5*self.objectShape['x'], 0]})
-            self.objectShapePoints.update({'rightUp': [0.5*self.objectShape['x'], self.objectShape['y']]})
-            self.objectShapePoints.update({'rightDown': [0.5*self.objectShape['x'], 0]})
-            self.determineParametersFromParallelGrasp()
 
     def determineParametersFromParallelGrasp(self):
-        self.gripperSlopeAngle = 0
         self.initGrasp2DParameters()
         self.initGripperEffectiveLength()
         self.createSearchRoomFromParallelGrasp()
@@ -126,7 +118,7 @@ class grasp_2D_parameters(gripper_shape):
         self.gripperAngleMoveRoom['end'][1] = math.pi/2 + 2*self.gripperOriginalPointOrientationAccuracy
 
 
-
+    # test the function!!!!! select a good orientation
     def findParametersWithExhaustiveSearch(self, graspType):
         """graspType = '1': parallel grasp"""
         """graspType = '2': grasp with planar and point contacts"""
@@ -134,33 +126,44 @@ class grasp_2D_parameters(gripper_shape):
         self.initGrasp2DParameters()
         startX = self.gripperOriginalPointPoseRoom['x'][0]
         endX = self.gripperOriginalPointPoseRoom['x'][1]
-        stepX = 0.5*self.gripperOriginalPointPositionAccuracy
+        stepX = self.gripperOriginalPointPositionAccuracy
         startY = self.gripperOriginalPointPoseRoom['y'][0]
         endY = self.gripperOriginalPointPoseRoom['y'][1]
-        stepY = 0.5*self.gripperOriginalPointPositionAccuracy
+        stepY = self.gripperOriginalPointPositionAccuracy
         startR = self.gripperOriginalPointPoseRoom['r'][0]
         endR = self.gripperOriginalPointPoseRoom['r'][1]
-        stepR = 0.5*self.gripperOriginalPointOrientationAccuracy
+        stepR = self.gripperOriginalPointOrientationAccuracy
         startAS = self.gripperAngleMoveRoom['start'][0]
         endAS = self.gripperAngleMoveRoom['start'][1]
-        stepAS = 0.5*self.gripperOriginalPointOrientationAccuracy
+        stepAS = self.gripperOriginalPointOrientationAccuracy
         startAE = self.gripperAngleMoveRoom['end'][0]
-        startAE = self.gripperAngleMoveRoom['end'][1]
-        stepAE = 0.5*self.gripperOriginalPointOrientationAccuracy
+        endAE = self.gripperAngleMoveRoom['end'][1]
+        stepAE = self.gripperOriginalPointOrientationAccuracy
         point = None
         angle = None
         if self.confirmToObjectShapeRestricrion(graspType):
-            for self.gripperOriginalPoint['position'][0] in numpy.arange(startX, endX, stepX):
-                for self.gripperOriginalPoint['position'][1] in numpy.arange(startY, endY, stepY):
-                    for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, endR, stepR):
-                        for self.gripperAngleMove['start'] in numpy.arange(startAS, endAS, stepAS):
-                            for self.gripperAngleMove['end'] in numpy.arange(startAE, endAE, stepAE):
+            print "1"
+            for self.gripperOriginalPoint['position'][0] in numpy.arange(startX, startX+1, stepX):
+                for self.gripperOriginalPoint['position'][1] in numpy.arange(startY, startY+1, stepY):
+                    for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, startR+0.01, stepR):
+                        for self.gripperAngleMove['start'] in numpy.arange(startAS, startAS+0.01, stepAS):
+                            for self.gripperAngleMove['end'] in numpy.arange(startAE, startAE+0.01, stepAE):
+                                self.gripperOriginalPoint['position'][0] = 6
+                                self.gripperOriginalPoint['position'][1] = -70
+                                self.gripperOriginalPoint['orientation'] = 1.57
+                                self.gripperAngleMove['start'] = 0
+                                self.gripperAngleMove['end'] = 1.57
                                 self.createGripperPointsPosition()
+                                print self.gripperPointsPositionFest
+                                print self.gripperPointsPositionMove
                                 if not self.conformToRestriction(graspType):
                                     continue
+                                print "22"
                                 evalValue = self.calculateCriteria(graspType)
+                                print evalValue
                                 if evalValue > self.evaluationValue:
                                     continue
+                                print "33"
                                 point = self.gripperOriginalPoint
                                 angle = self.gripperAngleMove
         if point is not None:
@@ -203,13 +206,12 @@ class grasp_2D_parameters(gripper_shape):
 
 
     def confirmToObjectShapeRestricrionFromParallelGrasp(self):
-        lengthDifference = self.gripperValidLengthFest['between'] - self.gripperValidLengthMove['between']
         angle = self.gripperAngleFest['start'] 
-        ObjectLengthXMin = lengthDifference*math.sin(angle)
-        objectLengthXMax = self.gripperValidLengthFest['between']*math.sin(angle) - self.gripperValidLengthMove['between']
-        if self.objectShape['x'] < ObjectLengthXMin:
+        objectLengthXMin = self.gripperValidLengthFest['between']*math.sin(angle) - self.gripperValidLengthMove['between'] -1
+        objectLengthXMax = self.gripperValidLengthFest['between']*math.sin(angle) + self.gripperValidLengthMove['between'] +1
+        if self.objectShape['x'] < objectLengthXMin:
             return False
-        if self.objectShape['x'] > ObjectLengthXMax:
+        if self.objectShape['x'] > objectLengthXMax:
             return False
         return True
 
@@ -260,13 +262,15 @@ class grasp_2D_parameters(gripper_shape):
         criteria3 = (L1+L2)/(self.gripperValidLengthFest['end']+self.gripperValidLengthMove['end'])
         criteria4 = (self.objectShape['y'] - (L1+L2)/2)/self.objectShape['y']
         evalValue = -criteria1 + criteria2 + criteria3 + criteria4
+        
+        #print criteria1
         return evalValue
 
     def getGripperTotalFestLengthX(self):
         theta = self.gripperOriginalPoint['orientation']
         startLengthX = self.gripperValidLengthFest['start']*math.sin(theta-math.pi/2)
         theta += self.gripperAngleFest['start']
-        betweenLengthX = sel.gripperLengthFest['between']*math.sin(theta-math.pi/2)
+        betweenLengthX = self.gripperLengthFest['between']*math.sin(theta-math.pi/2)
         theta += self.gripperAngleFest['end']
         endLengthX = self.gripperValidLengthFest['end']*math.sin(theta-math.pi/2)
         totalLengthX = startLengthX + betweenLengthX + endLengthX
@@ -276,7 +280,7 @@ class grasp_2D_parameters(gripper_shape):
         theta = self.gripperOriginalPoint['orientation']
         startLengthY = self.gripperValidLengthFest['start']*math.cos(theta-math.pi/2)
         theta += self.gripperAngleFest['start']
-        betweenLengthY = sel.gripperLengthFest['between']*math.cos(theta-math.pi/2)
+        betweenLengthY = self.gripperLengthFest['between']*math.cos(theta-math.pi/2)
         theta += self.gripperAngleFest['end']
         endLengthY = self.gripperValidLengthFest['end']*math.cos(theta-math.pi/2)
         totalLengthY = startLengthY + betweenLengthY + endLengthY
@@ -453,10 +457,6 @@ class grasp_2D_parameters(gripper_shape):
         return
 
 
-
-
-
-
     def isPointOnLine(self, point, line):
         distance = self.getDistanceFromPointToLine(point, line)
         if distance < self.distancePointOnLineMax:
@@ -471,7 +471,7 @@ class grasp_2D_parameters(gripper_shape):
         xMax = max(lineSegment[0][0], lineSegment[1][0])
         yMin = min(lineSegment[0][1], lineSegment[1][1])
         yMax = max(lineSegment[0][1], lineSegment[1][1])
-        if ((point[0] >= xMin)or(point[0] <= xMax)) and ((point[1] >= yMin)or(point[1] <= yMax)):
+        if ((point[0] >= xMin)and(point[0] <= xMax)) and ((point[1] >= yMin)and(point[1] <= yMax)):
             return True
         else:
             return False
@@ -487,7 +487,7 @@ class grasp_2D_parameters(gripper_shape):
             return False
 
     def getCoincideLineLength(self, startLine, endLine):
-        if not self.isLinesCoincide(startLine, endLinestartLine, endLine):
+        if not self.isLinesCoincide(startLine, endLine):
             return 0
         point = []
         if self.isPointOnLineSegment(startLine[0], endLine):
@@ -509,8 +509,8 @@ class grasp_2D_parameters(gripper_shape):
         """ax+by+c=0 line is build up with one point and slope with lineType = '2'"""
         if lineType is '1':
             a = line[1][1] - line[0][1]
-            b = line[0][0] - line[1][0]
-            c = line[0][1]*(line[1][0]-line[0][0]) - line[0][0]*(line[1][1]-line[0][1])
+            b = line[1][0] - line[0][0]
+            c = line[0][1]*line[1][0] - line[0][0]*line[1][1]
         elif lineType is '2':
             a = math.sin(line[1])
             b = math.cos(line[1])
@@ -519,7 +519,7 @@ class grasp_2D_parameters(gripper_shape):
             print "wrong input! (getDistanceFromPointToLine)"
             exit()
 
-        distance = math.fabs(a*point[0]+b*point[1]+c)/math.sqrt(a**2+b**2)
+        distance = math.fabs(a*point[0]-b*point[1]+c)/math.sqrt(a**2+b**2)
         return distance
 
     def getDistanceBetweenPoints(self, startPoint, endPoint):
@@ -558,3 +558,14 @@ class grasp_2D_parameters(gripper_shape):
             print "the crossing point is not on lines!"
             return False
 
+
+
+if __name__ == '__main__':
+    rospy.init_node('grasp_2D_parameters')
+    graspParameters = grasp_2D_parameters(112, 30)
+    try:
+        graspParameters.determineParametersFromParallelGrasp()
+    except:
+        exit()
+    print graspParameters.existence
+    print graspParameters.gripperOriginalPoint
