@@ -104,20 +104,21 @@ class grasp_2D_parameters(gripper_shape):
         self.findParametersWithExhaustiveSearch('1')
 
     def createSearchRoomFromParallelGrasp(self):
-        accurateOrientation = math.pi - self.gripperAngleFest['start'] - self.gripperAngleFest['end']
+        accurateOrientation = math.pi/2 - self.gripperAngleFest['start'] - self.gripperAngleFest['end']
         self.gripperOriginalPointPoseRoom['r'][0] = accurateOrientation - 2*self.gripperOriginalPointOrientationAccuracy
         self.gripperOriginalPointPoseRoom['r'][1] = accurateOrientation + 2*self.gripperOriginalPointOrientationAccuracy
         accuratePositionX = -self.objectShape['x']/2 + self.getGripperTotalFestLengthX()
-        self.gripperOriginalPointPoseRoom['x'][0] = accuratePositionX - 5*self.gripperOriginalPointPositionAccuracy
-        self.gripperOriginalPointPoseRoom['x'][1] = accuratePositionX + 3*self.gripperOriginalPointPositionAccuracy
+        self.gripperOriginalPointPoseRoom['x'][0] = accuratePositionX - 2*self.gripperOriginalPointPositionAccuracy
+        self.gripperOriginalPointPoseRoom['x'][1] = accuratePositionX + 2*self.gripperOriginalPointPositionAccuracy
         accuratePositionY = -self.getGripperTotalFestLengthY()
-        self.gripperOriginalPointPoseRoom['y'][0] = accuratePositionY
-        self.gripperOriginalPointPoseRoom['y'][1] = accuratePositionY + self.objectShape['y']
-        self.gripperAngleMoveRoom['start'][0] = 0
-        self.gripperAngleMoveRoom['start'][1] = math.pi
+        self.gripperOriginalPointPoseRoom['y'][0] = accuratePositionY - 2*self.gripperOriginalPointPositionAccuracy
+        self.gripperOriginalPointPoseRoom['y'][1] = accuratePositionY + self.objectShape['y'] + \
+                                                    + 2*self.gripperOriginalPointPositionAccuracy
+        self.gripperAngleMoveRoom['start'][0] = 0 - 2*self.gripperOriginalPointOrientationAccuracy
+        self.gripperAngleMoveRoom['start'][1] = math.pi + 2*self.gripperOriginalPointOrientationAccuracy
         self.gripperAngleMoveRoom['end'][0] = math.pi/2 - 2*self.gripperOriginalPointOrientationAccuracy
         self.gripperAngleMoveRoom['end'][1] = math.pi/2 + 2*self.gripperOriginalPointOrientationAccuracy
-
+        print self.gripperOriginalPointPoseRoom, self.gripperAngleMoveRoom, self.gripperAngleFest
 
     # test the function!!!!! select a good orientation
     def findParametersWithExhaustiveSearch(self, graspType):
@@ -148,11 +149,6 @@ class grasp_2D_parameters(gripper_shape):
                     for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, endR, stepR):
                         for self.gripperAngleMove['start'] in numpy.arange(startAS, endAS, stepAS):
                             for self.gripperAngleMove['end'] in numpy.arange(startAE, endAE, stepAE):
-                                self.gripperOriginalPoint['position'][0] = 5
-                                self.gripperOriginalPoint['position'][1] = -70
-                                self.gripperOriginalPoint['orientation'] = 1.57
-                                self.gripperAngleMove['start'] = 0
-                                self.gripperAngleMove['end'] = 1.57
                                 self.createGripperPointsPosition()
                                 if not self.conformToRestriction(graspType):
                                     continue
@@ -568,3 +564,6 @@ if __name__ == '__main__':
         exit()
     print graspParameters.existence
     print graspParameters.gripperOriginalPoint
+    print graspParameters.gripperAngleMove
+    print graspParameters.evaluationValue
+    rospy.spin()
