@@ -6,7 +6,7 @@
 
   <!--test test-name="ObjectConfiguration" pkg="grasp_table_generation" type="TestObjectConfiguration.py"/-->
 
-  <!--node name="grasp_2D_parameters" ns="grasp_table_generation" pkg="grasp_table_generation" type="grasp_2D_parameters.py" output="screen"/-->
+  <node name="grasp_2D_parameters" ns="grasp_table_generation" pkg="grasp_table_generation" type="grasp_2D_parameters.py" output="screen"/>
 
   <test test-name="Grasp2DParameters" pkg="grasp_table_generation" type="TestGrasp2DParameters.py"/>
 
