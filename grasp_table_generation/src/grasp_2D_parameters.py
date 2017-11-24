@@ -206,10 +206,11 @@ class grasp_2D_parameters(gripper_shape):
         self.gripperOriginalPointPoseRoom['x'][0] = accuratePositionX - 2*self.gripperOriginalPointPositionAccuracy
         self.gripperOriginalPointPoseRoom['x'][1] = accuratePositionX + 2*self.gripperOriginalPointPositionAccuracy
         accuratePositionY = -self.getGripperTotalFestLengthY()
-        self.gripperOriginalPointPoseRoom['y'][0] = accuratePositionY - 2*self.gripperOriginalPointPositionAccuracy
+        self.gripperOriginalPointPoseRoom['y'][0] = accuratePositionY
         self.gripperOriginalPointPoseRoom['y'][1] = accuratePositionY + self.gripperLengthFest['end']
-        self.gripperAngleMoveRoom['start'][0] = 0 - 2*self.gripperOriginalPointOrientationAccuracy
-        self.gripperAngleMoveRoom['start'][1] = math.pi + 2*self.gripperOriginalPointOrientationAccuracy
+        fingerAngle = self.getGripperFingerAngleFromParallelGrasp()
+        self.gripperAngleMoveRoom['start'][0] = fingerAngle - 2*self.gripperOriginalPointOrientationAccuracy
+        self.gripperAngleMoveRoom['start'][1] = fingerAngle + 2*self.gripperOriginalPointOrientationAccuracy
         self.gripperAngleMoveRoom['end'][0] = math.pi/2 - 2*self.gripperOriginalPointOrientationAccuracy
         self.gripperAngleMoveRoom['end'][1] = math.pi/2 + 2*self.gripperOriginalPointOrientationAccuracy
         print self.gripperOriginalPointPoseRoom, self.gripperAngleMoveRoom, self.gripperAngleFest
@@ -285,25 +286,50 @@ class grasp_2D_parameters(gripper_shape):
 
     def getGripperTotalFestLengthX(self):
         """calculate the total length of fest gripper in direction x"""
-        theta = self.gripperOriginalPoint['orientation']
-        startLengthX = self.gripperValidLengthFest['start']*math.sin(theta-math.pi/2)
-        theta += self.gripperAngleFest['start']
-        betweenLengthX = self.gripperLengthFest['between']*math.sin(theta-math.pi/2)
-        theta += self.gripperAngleFest['end']
-        endLengthX = self.gripperValidLengthFest['end']*math.sin(theta-math.pi/2)
-        totalLengthX = startLengthX + betweenLengthX + endLengthX
+        #theta = self.gripperOriginalPoint['orientation']
+        #startLengthX = self.gripperValidLengthFest['start']*math.sin(theta-math.pi/2)
+        #theta += self.gripperAngleFest['start']
+        #betweenLengthX = self.gripperLengthFest['between']*math.sin(theta-math.pi/2)
+        #theta += self.gripperAngleFest['end']
+        #endLengthX = self.gripperValidLengthFest['end']*math.sin(theta-math.pi/2)
+        #totalLengthX = startLengthX + betweenLengthX + endLengthX
+
+        theta = math.pi/2
+        theta -= self.gripperAngleFest['end']
+        totalLengthX = self.gripperValidLengthFest['between']*math.cos(math.pi-theta)
+        theta -= self.gripperAngleFest['start']
+        totalLengthX += self.gripperValidLengthFest['start']*math.cos(math.pi-theta)
+
         return totalLengthX
 
     def getGripperTotalFestLengthY(self):
         """calculate the total length of fest gripper in direction y"""
-        theta = self.gripperOriginalPoint['orientation']
-        startLengthY = self.gripperValidLengthFest['start']*math.cos(theta-math.pi/2)
-        theta += self.gripperAngleFest['start']
-        betweenLengthY = self.gripperLengthFest['between']*math.cos(theta-math.pi/2)
-        theta += self.gripperAngleFest['end']
-        endLengthY = self.gripperValidLengthFest['end']*math.cos(theta-math.pi/2)
-        totalLengthY = startLengthY + betweenLengthY + endLengthY
+        #theta = self.gripperOriginalPoint['orientation']
+        #startLengthY = self.gripperValidLengthFest['start']*math.cos(theta-math.pi/2)
+        #theta += self.gripperAngleFest['start']
+        #betweenLengthY = self.gripperLengthFest['between']*math.cos(theta-math.pi/2)
+        #theta += self.gripperAngleFest['end']
+        #endLengthY = self.gripperValidLengthFest['end']*math.cos(theta-math.pi/2)
+        #totalLengthY = startLengthY + betweenLengthY + endLengthY
+        
+        theta = math.pi/2
+        totalLengthY = self.gripperValidLengthFest['end']
+        theta -= self.gripperAngleFest['end']
+        totalLengthY += self.gripperValidLengthFest['between']*math.sin(math.pi-theta)
+        theta -= self.gripperAngleFest['start']
+        totalLengthY += self.gripperValidLengthFest['start']*math.sin(math.pi-theta)
+
         return totalLengthY
+
+    def getGripperFingerAngleFromParallelGrasp(self):
+        theta = math.pi/2
+        theta -= self.gripperAngleFest['end']
+        xLengthLeft = self.gripperValidLengthFest['between']*math.cos(math.pi-theta)
+        theta -= self.gripperAngleFest ['start']
+        xLengthLeft += (self.gripperValidLengthFest['start'] - self.gripperValidLengthMove['start']) * math.cos(math.pi-theta)
+        cos = (self.objectShape['x'] - xLengthLeft)/self.gripperValidLengthMove['between']
+        fingerAngle = math.acos(cos)
+        return fingerAngle
 
 
     def determineParametersFromPlanarPointContact(self):
@@ -598,7 +624,7 @@ class grasp_2D_parameters(gripper_shape):
 
 if __name__ == '__main__':
     rospy.init_node('grasp_2D_parameters')
-    graspParameters = grasp_2D_parameters(60, 10)
+    graspParameters = grasp_2D_parameters(90, 10)
     try:
         graspParameters.determineParametersFromParallelGrasp()
     except:
