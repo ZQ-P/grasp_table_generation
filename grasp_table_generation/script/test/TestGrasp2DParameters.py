@@ -12,7 +12,7 @@ import threading
 import tf
 from geometry_msgs.msg import PoseStamped, TransformStamped
 import rospy
-from grasp_2D_parameters import grasp_2D_parameters
+from grasp_table_generation.grasp_2D_parameters import grasp_2D_parameters
 
 class TestGrasp2DParameters(unittest.TestCase):
     def setUp(self):

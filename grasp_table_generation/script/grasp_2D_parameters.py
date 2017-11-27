@@ -194,6 +194,7 @@ class grasp_2D_parameters(gripper_shape):
         self.initGripperEffectiveLength()
         self.createSearchRoomFromParallelGrasp()
         self.findParametersWithExhaustiveSearch('1')
+        return [self.gripperOriginalPoint, self.gripperAngleMove]
     
     # position y maybe need to change, but be careful if using exaustive search
     # CMA-ES or genetic algorithm (GA) or Greedy 
@@ -626,7 +627,7 @@ if __name__ == '__main__':
     rospy.init_node('grasp_2D_parameters')
     graspParameters = grasp_2D_parameters(90, 10)
     try:
-        graspParameters.determineParametersFromParallelGrasp()
+        print graspParameters.determineParametersFromParallelGrasp()
     except:
         exit()
     print graspParameters.existence

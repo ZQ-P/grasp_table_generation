@@ -6,12 +6,12 @@ import tf
 
 class ObjectConfiguration():
     def __init__(self):
-        self.initPublisher()
+        self.initBroadcaster()
         self.initObjectDescription3D()
         self.initParameter()
         self.initObjectDescription2D()
 
-    def initPublisher(self):
+    def initBroadcaster(self):
         self.brObjectFrame = tf.TransformBroadcaster()
 
     def initParameter(self):

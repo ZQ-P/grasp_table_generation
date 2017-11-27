@@ -1,5 +1,5 @@
-objectLength: 20 #2
-objectWidth: 40 #4
+objectLength: 60 #2
+objectWidth: 60 #4
 objectHeight: 60 #6
 objectCoordnationPose3D: 'mittel'
 objectWeightLevel: 'mittel'
