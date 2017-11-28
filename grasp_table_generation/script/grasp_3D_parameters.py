@@ -26,6 +26,7 @@ class grasp_3D_parameters():
         self.object2DFrames = ['/object2Dxy', '/object2Dxz', '/object2Dyx', '/object2Dyz', '/object2Dzx', '/object2Dzy']
         self.objectCenterFrameName = '/object3DCenter'
         self.objectOriginalCoordnationFrameName = '/objectOriginalCoordination'
+        self.objectName = "aaa"
 
     def initParameters(self):
         self.grasp3DPose = []
@@ -93,19 +94,41 @@ class grasp_3D_parameters():
 
 
     def writeGraspListInCSV(self):
-        filename = 'sdhx_filename.csv'
+        filename = "/home/rmb-pz/git/care-o-bot-indigo/src/Fraunhofer-IPA/grasp_table_generation/script/sdhx_filename.csv"
         with open(filename, 'wb') as csvfile:
-            print csvfile
-            output = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_ALL)
-            print output.writerow(['id', 'object', 'gripper_finger_1_joint', 'gripper_finger_2_joint', 'direction', 'qw', 'qx', 'qy', 'qz', 'pos-x', 'pos-y', 'pos-z', 'eps_l1', 'vol_l1'])
-            print "write the file successfully"
+            csvWriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            titleOfCSV = ['id\t','object\t', 'gripper_finger_1_joint\t', 'gripper_finger_2_joint\t', 'direction\t', 
+                            'qw\t', 'qx\t', 'qy\t', 'qz\t', 'pos-x\t', 'pos-y\t', 'pos-z\t', 'eps_l1\t', 'vol_l1\t']
+            csvWriter.writerow(titleOfCSV)
+            for index, grasp3DPose in enumerate(self.grasp3DPose):
+                output = self.transformToCSVForm(index, grasp3DPose)
+                csvWriter.writerow(output)
+            #print "write the file successfully"
+        
+    def transformToCSVForm(self, index, grasp3DPose):
+        output = []
+        output.append(str(index) + '\t')
+        output.append(self.objectName + '\t')
+        output.append(str(self.grasp3DFingerAngle[index]['start']) + '\t')
+        output.append(str(self.grasp3DFingerAngle[index]['end']) + '\t')
+        output.append('SIDE\t')
+        output.append(str(grasp3DPose.pose.orientation.w) + '\t')
+        output.append(str(grasp3DPose.pose.orientation.x) + '\t')
+        output.append(str(grasp3DPose.pose.orientation.y) + '\t')
+        output.append(str(grasp3DPose.pose.orientation.z) + '\t')
+        output.append(str(grasp3DPose.pose.position.x) + '\t')
+        output.append(str(grasp3DPose.pose.position.y) + '\t')
+        output.append(str(grasp3DPose.pose.position.z) + '\t')
+        output.append('0.01\t')
+        output.append('0.0005\t')
+        return output
 
         
 if __name__ == "__main__":
     rospy.init_node("grasp_3D_parameters")
     grasp3DParameters = grasp_3D_parameters()
     try:
-        #grasp3DParameters.generate3DParameter()
+        grasp3DParameters.generate3DParameter()
         pass
     except:
         rospy.logerr("grasp_3D_parameters: cannot generate 3D Parameters!")
@@ -114,7 +137,8 @@ if __name__ == "__main__":
     try:
         grasp3DParameters.writeGraspListInCSV()
     except:
-        rospy.logerr("grasp_3D_parameters: cannot open the file!")
+        rospy.logerr("grasp_3D_parameters: something is wrong while writing the data to csv file!")
         exit()
     rospy.loginfo("grasp_3D_parameters: save the paramters to the csv file successfully!")
     rospy.spin()
+

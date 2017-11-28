@@ -5,12 +5,12 @@ objectCoordnationPose3D: 'mittel'
 objectWeightLevel: 'mittel'
 objectHardnessLevel: 'mittel'
 
-gripperLengthFest1: 60 #63.464
-gripperLengthFest2: 60 #62.390
-gripperLengthFest3: 70 #77.050
-gripperAngleFestL12: 1.57 #not sure
-gripperAngleFestL23: -1.57 #not sure
-gripperLengthMove1: 50 #46
-gripperLengthMove2: 50 #50
-gripperLengthMove3: 70 #70
+gripperLengthFest1: 65.59 #63.464
+gripperLengthFest2: 53.82 #62.390
+gripperLengthFest3: 77 #77.050
+gripperAngleFestL12: 1.3788 #not sure
+gripperAngleFestL23: -1.1686 #not sure
+gripperLengthMove1: 44.18 #46
+gripperLengthMove2: 56 #50
+gripperLengthMove3: 62 #70
 gripperWidthMove: 15
