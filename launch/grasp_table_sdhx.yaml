@@ -1,15 +1,15 @@
-objectLength: 60 #2
-objectWidth: 60 #4
-objectHeight: 60 #6
+objectLength: 228 #2
+objectWidth: 63 #4
+objectHeight: 113 #6
 objectCoordnationPose3D: 'mittel'
 objectWeightLevel: 'mittel'
 objectHardnessLevel: 'mittel'
 
 gripperLengthFest1: 65.59 #63.464
-gripperLengthFest2: 53.82 #62.390
+gripperLengthFest2: 26 #53.82 #62.390
 gripperLengthFest3: 77 #77.050
-gripperAngleFestL12: 1.3788 #not sure
-gripperAngleFestL23: -1.1686 #not sure
+gripperAngleFestL12: 1.3788
+gripperAngleFestL23: -1.1686
 gripperLengthMove1: 44.18 #46
 gripperLengthMove2: 56 #50
 gripperLengthMove3: 62 #70

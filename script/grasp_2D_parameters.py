@@ -29,7 +29,7 @@ class grasp_2D_parameters(gripper_shape):
     def initGrasp2DTolerances(self):
         """initialize and declare parameters of tolerances"""
         self.lengthLineConformMin = 1
-        self.distanceObectGripperMin = 5
+        self.distanceObectGripperMin = 10
         #self.distanceLineConformMax = 0.2
         self.distancePointOnLineMax = 1
         self.gripperOriginalPointPositionAccuracy = 1
@@ -129,21 +129,20 @@ class grasp_2D_parameters(gripper_shape):
         stepAE = self.gripperOriginalPointOrientationAccuracy
         point = None
         angle = None
-        if self.confirmToObjectShapeRestricrion(graspType):
-            for self.gripperOriginalPoint['position'][0] in numpy.arange(startX, endX, stepX):
-                for self.gripperOriginalPoint['position'][1] in numpy.arange(startY, endY, stepY):
-                    for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, endR, stepR):
-                        for self.gripperAngleMove['start'] in numpy.arange(startAS, endAS, stepAS):
-                            for self.gripperAngleMove['end'] in numpy.arange(startAE, endAE, stepAE):
-                                self.createGripperPointsPosition()
-                                if not self.conformToRestriction(graspType):
-                                    continue
-                                evalValue = self.calculateCriteria(graspType)
-                                if evalValue > self.evaluationValue:
-                                    continue
-                                self.evaluationValue = evalValue
-                                point = copy.deepcopy(self.gripperOriginalPoint)
-                                angle = copy.deepcopy(self.gripperAngleMove)
+        for self.gripperOriginalPoint['position'][0] in numpy.arange(startX, endX, stepX):
+            for self.gripperOriginalPoint['position'][1] in numpy.arange(startY, endY, stepY):
+                for self.gripperOriginalPoint['orientation'] in numpy.arange(startR, endR, stepR):
+                    for self.gripperAngleMove['start'] in numpy.arange(startAS, endAS, stepAS):
+                        for self.gripperAngleMove['end'] in numpy.arange(startAE, endAE, stepAE):
+                            self.createGripperPointsPosition()
+                            if not self.conformToRestriction(graspType):
+                                continue
+                            evalValue = self.calculateCriteria(graspType)
+                            if evalValue > self.evaluationValue:
+                                continue
+                            self.evaluationValue = evalValue
+                            point = copy.deepcopy(self.gripperOriginalPoint)
+                            angle = copy.deepcopy(self.gripperAngleMove)
         if point is not None:
             self.existence = True
             self.gripperOriginalPoint = point
@@ -157,9 +156,9 @@ class grasp_2D_parameters(gripper_shape):
             return self.confirmToObjectShapeRestricrionFromPlanarPointContact()
         if graspType is '3':
             return self.confirmToObjectShapeRestricrionFromPointContacts()
-        else:
-            print "there is no such grasping type!"
-            exit()
+        rospy.logwarn("confirmToObjectShapeRestricrion: there is no such grasping type!")
+        return False
+        #exit()
 
     def conformToRestriction(self, graspType):
         """check if choosed parameters confirm to the restriction of grasping"""
@@ -169,9 +168,9 @@ class grasp_2D_parameters(gripper_shape):
             return self.conformToRestrictionFromPlanarPointContact()
         if graspType is '3':
             return self.conformToRestrictionFromPointContacts()
-        else:
-            print "there is no such grasping type!"
-            exit()
+        rospy.logwarn("confirmToObjectShapeRestricrion: there is no such grasping type!")
+        return False
+        #exit()
 
     def calculateCriteria(self, graspType):
         """calculte the evaluated value based on the function of evaluation and choosed parameters"""
@@ -181,9 +180,9 @@ class grasp_2D_parameters(gripper_shape):
             return self.calculateCriteriaFromPlanarPointContact()
         if graspType is '3':
             return self.calculateCriteriaFromPointContacts()
-        else:
-            print "there is no such grasping type!"
-            exit()
+        rospy.logwarn("confirmToObjectShapeRestricrion: there is no such grasping type!")
+        return False
+        #exit()
 
 
 
@@ -192,8 +191,14 @@ class grasp_2D_parameters(gripper_shape):
         self.gripperSlopeAngle = 0
         self.initGrasp2DParameters()
         self.initGripperEffectiveLength()
-        self.createSearchRoomFromParallelGrasp()
-        self.findParametersWithExhaustiveSearch('1')
+        if not self.confirmToObjectShapeRestricrion('1'):
+            rospy.loginfo("determineParametersFromParallelGrasp:: the size of rechtecke is to big!")
+            return [self.gripperOriginalPoint, self.gripperAngleMove]
+        try:
+            self.createSearchRoomFromParallelGrasp()
+            self.findParametersWithExhaustiveSearch('1')
+        except:
+            rospy.logerr("determineParametersFromParallelGrasp:: search strategy is wrong!")
         return [self.gripperOriginalPoint, self.gripperAngleMove]
     
     # position y maybe need to change, but be careful if using exaustive search
@@ -579,7 +584,7 @@ class grasp_2D_parameters(gripper_shape):
             b = math.cos(line[1])
             c = -a*line[0][0] -b*line[0][1]
         else:
-            print "wrong input! (getDistanceFromPointToLine)"
+            rospy.logwarn("getDistanceFromPointToLine: wrong input!")
             exit()
 
         distance = math.fabs(a*point[0]-b*point[1]+c)/math.sqrt(a**2+b**2)

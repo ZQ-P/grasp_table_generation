@@ -20,12 +20,12 @@ class ObjectConfiguration():
         self.objectOriginalCoordnationFrameName = '/objectOriginalCoordination'
         self.objectOriginalCoordnationFromCenter = {'translation': [0,0,0], 'rotation': [0, 0, 0]}
         self.object2DFrameTransformFrom3D = {}
-        self.object2DFrameTransformFrom3D.update({'xy': [[0, self.objectShape3D['y']/-2, 0], [0, 0, 0]]})
-        self.object2DFrameTransformFrom3D.update({'xz': [[0, 0, self.objectShape3D['z']/-2], [math.pi/2, 0, 0]]})
-        self.object2DFrameTransformFrom3D.update({'yx': [[self.objectShape3D['x']/-2, 0, 0], [math.pi, 0, -math.pi/2]]})
-        self.object2DFrameTransformFrom3D.update({'yz': [[0, 0, self.objectShape3D['z']/-2], [math.pi/2, math.pi/2, 0]]})
-        self.object2DFrameTransformFrom3D.update({'zx': [[self.objectShape3D['x']/-2, 0, 0], [-math.pi/2, 0, -math.pi/2]]})
-        self.object2DFrameTransformFrom3D.update({'zy': [[0, self.objectShape3D['y']/-2, 0], [0, -math.pi/2, 0]]})
+        self.object2DFrameTransformFrom3D.update({'xy': [[0, -self.objectShape3D['y']/2, 0], [0, 0, 0]]})
+        self.object2DFrameTransformFrom3D.update({'xz': [[0, 0, -self.objectShape3D['z']/2], [math.pi/2, 0, 0]]})
+        self.object2DFrameTransformFrom3D.update({'yx': [[-self.objectShape3D['x']/2, 0, 0], [math.pi, 0, -math.pi/2]]})
+        self.object2DFrameTransformFrom3D.update({'yz': [[0, 0, -self.objectShape3D['z']/2], [math.pi/2, math.pi/2, 0]]})
+        self.object2DFrameTransformFrom3D.update({'zx': [[-self.objectShape3D['x']/2, 0, 0], [-math.pi/2, 0, -math.pi/2]]})
+        self.object2DFrameTransformFrom3D.update({'zy': [[0, -self.objectShape3D['y']/2, 0], [0, -math.pi/2, 0]]})
 
     def initBaseFrame(self):
         self.broadcastObjectCenterFrame()
@@ -81,7 +81,7 @@ class ObjectConfiguration():
         roll = object2DFrameRotation[0]
         pitch = object2DFrameRotation[1]
         yaw = object2DFrameRotation[2]
-        object2DFrameQuaternion = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
+        object2DFrameQuaternion = tf.transformations.quaternion_from_euler(roll, pitch, yaw, 'rxyz')
         object2DFrameName = '/object2D' + projectedPlane
         self.object2DFrameName.update({projectedPlane: object2DFrameName})
         self.brObjectFrame.sendTransform(object2DFrameTranslation, object2DFrameQuaternion, rospy.Time.now(), object2DFrameName, self.objectCenterFrameName)
