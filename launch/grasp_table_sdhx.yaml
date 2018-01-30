@@ -6,7 +6,7 @@ objectWeightLevel: 'mittel'
 objectHardnessLevel: 'mittel'
 
 gripperLengthFest1: 65.59 #63.464
-gripperLengthFest2: 26 #53.82 #62.390
+gripperLengthFest2: 53.82 #53.82 #62.390 #26
 gripperLengthFest3: 77 #77.050
 gripperAngleFestL12: 1.3788
 gripperAngleFestL23: -1.1686
@@ -14,3 +14,4 @@ gripperLengthMove1: 44.18 #46
 gripperLengthMove2: 56 #50
 gripperLengthMove3: 62 #70
 gripperWidthMove: 15
+gripperOffset: 21.82

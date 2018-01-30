@@ -10,6 +10,6 @@
 
   <!--test test-name="Grasp2DParameters" pkg="grasp_table_generation" type="TestGrasp2DParameters.py"/-->
 
-  <node name="grasp_3D_parameters" ns="grasp_table_generation" pkg="grasp_table_generation" type="grasp_3D_parameters.py" output="screen"/>
+  <!--node name="grasp_3D_parameters" ns="grasp_table_generation" pkg="grasp_table_generation" type="grasp_3D_parameters.py" output="screen"/-->
 
 </launch>

@@ -5,8 +5,9 @@ import rospy
 import tf
 import math
 import copy
+import threading
 from ObjectConfiguration import ObjectConfiguration
-from grasp_2D_parameters import grasp_2D_parameters
+from grasp_2D import grasp_2D
 from geometry_msgs.msg import PoseStamped
 
 class grasp_3D_parameters():
@@ -17,7 +18,8 @@ class grasp_3D_parameters():
 
 
     def initListener(self):
-        self.listener = tf.TransformListener()
+        with threading.Lock():
+            self.listener = tf.TransformListener(True, rospy.Duration(40.0))
 
     def initObject(self):
         objectLength = rospy.get_param('/grasp_table_generation/objectLength')
@@ -33,7 +35,6 @@ class grasp_3D_parameters():
         self.grasp3DPose = []
         self.grasp3DFingerAngle = []
         self.existence = False
-
 
     def generate3DParameter(self):
         for index, frame in enumerate(self.object2DFrames):
@@ -52,8 +53,8 @@ class grasp_3D_parameters():
     def generate2DParameter(self, frame):
         object2DLengthIndex = frame[9]
         object2DWidthIndex = frame[10]
-        grasp2D = grasp_2D_parameters(self.objectShape3D[object2DLengthIndex], self.objectShape3D[object2DWidthIndex])
-        grasp2DParameter = grasp2D.determineParametersFromParallelGrasp()
+        grasp2D = grasp_2D(self.objectShape3D[object2DLengthIndex], self.objectShape3D[object2DWidthIndex])
+        grasp2DParameter = grasp2D.getGraspParameters()
         self.existence = grasp2D.existence
         return grasp2DParameter
 
@@ -75,7 +76,9 @@ class grasp_3D_parameters():
     def create3DPoseToCenter(self, frame, grasp3DPoseTo2D):
         grasp3DPose = PoseStamped()
         try:
-            self.listener.waitForTransform(self.objectCenterFrameName, frame, rospy.Time.now(), rospy.Duration(10.0))
+            print self.objectCenterFrameName, frame
+            self.listener.waitForTransform(self.objectCenterFrameName, frame, rospy.Time.now(), rospy.Duration(15.0))
+            print "--------------------------"
             grasp3DPose = self.listener.transformPose(self.objectCenterFrameName, grasp3DPoseTo2D)
         except:
             rospy.logerr("generate3DPose: cannot tranform the position")

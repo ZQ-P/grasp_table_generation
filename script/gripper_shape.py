@@ -7,6 +7,7 @@ class gripper_shape():
         self.initGripperLengthFest()
         self.initGripperAngleFest()
         self.initGripperLengthMove()
+        self.initGripperWithMove()
 
     def initGripperLengthFest(self):
         gripperLengthFest1 = rospy.get_param('/grasp_table_generation/gripperLengthFest1')
@@ -27,4 +28,5 @@ class gripper_shape():
 
     def initGripperWithMove(self):
         self.gripperWidthMove = rospy.get_param('/grasp_table_generation/gripperWidthMove')
+        self.gripperOffset = rospy.get_param('/grasp_table_generation/gripperOffset')
     
